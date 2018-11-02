@@ -1,3 +1,3 @@
 FROM ubuntu:16.04
-ADD ./web /
+ADD web /web
 CMD /web
