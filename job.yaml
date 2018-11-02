@@ -20,7 +20,7 @@ spec:
       containers:
       - name: build
         image: gcr.io/kaniko-project/executor:latest
-        args: ["-c", "/workspace/build/hello-world/", "-d", "alexellis2/hello-world-auto:kaniko"]
+        args: ["-c", "/workspace/build/web/", "-d", "jmcarbo/web-hello-world:kaniko"]
         env:
         - name: DOCKER_CONFIG
           value: "/kaniko/secrets"
@@ -34,15 +34,7 @@ spec:
       - name: clone
         image: alpine:3.7
         command: ["/bin/sh","-c"]
-        args: ['apk add --no-cache git && git clone https://github.com/alexellis/hello-world-kaniko /workspace/ && git clone https://github.com/openfaas/templates /workspace/templates']
-        volumeMounts:
-        - name: build-context
-          mountPath: /workspace
-      - name: shrinkwrap
-        image: openfaas/faas-cli:0.6.14
-        command: ["/bin/sh","-c"]
-        args: ["cp -r ./templates/template . && faas-cli build --shrinkwrap -f stack.yml"]
-        workingDir: /workspace
+        args: ['apk add --no-cache git && git clone https://github.com/jmcarbo/autodocker /workspace/ ']
         volumeMounts:
         - name: build-context
           mountPath: /workspace
