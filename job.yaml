@@ -1,0 +1,56 @@
+# Alex Ellis 2018
+# Example from: https://blog.alexellis.io/quick-look-at-google-kaniko/
+
+# Pre-steps:
+# kubectl create secret generic docker-config --from-file $HOME/.docker/config.json
+
+# Other potential optimizations (suggested by @errordeveloper)
+# - Store "templates" in a permanent volume
+# - Download source via "tar" instead of git clone
+
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: build-job
+  labels:
+    app: kaniko-example
+spec:
+  template:
+    spec:
+      containers:
+      - name: build
+        image: gcr.io/kaniko-project/executor:latest
+        args: ["-c", "/workspace/build/hello-world/", "-d", "alexellis2/hello-world-auto:kaniko"]
+        env:
+        - name: DOCKER_CONFIG
+          value: "/kaniko/secrets"
+        volumeMounts:
+        - name: build-context
+          mountPath: /workspace
+        - name: docker-config
+          mountPath: "/kaniko/secrets"
+          readOnly: true
+      initContainers:
+      - name: clone
+        image: alpine:3.7
+        command: ["/bin/sh","-c"]
+        args: ['apk add --no-cache git && git clone https://github.com/alexellis/hello-world-kaniko /workspace/ && git clone https://github.com/openfaas/templates /workspace/templates']
+        volumeMounts:
+        - name: build-context
+          mountPath: /workspace
+      - name: shrinkwrap
+        image: openfaas/faas-cli:0.6.14
+        command: ["/bin/sh","-c"]
+        args: ["cp -r ./templates/template . && faas-cli build --shrinkwrap -f stack.yml"]
+        workingDir: /workspace
+        volumeMounts:
+        - name: build-context
+          mountPath: /workspace
+      restartPolicy: Never
+      volumes:
+      - name: build-context
+        emptyDir: {}
+      - name: docker-config
+        secret:
+          secretName: docker-config
+
