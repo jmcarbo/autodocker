@@ -20,7 +20,7 @@ spec:
       containers:
       - name: build
         image: gcr.io/kaniko-project/executor:latest
-        args: ["-c", "/workspace/build/web/", "-d", "jmcarbo/web-hello-world:kaniko"]
+        args: ["-c", "/workspace/build/", "-d", "jmcarbo/web-hello-world:kaniko"]
         env:
         - name: DOCKER_CONFIG
           value: "/kaniko/secrets"
