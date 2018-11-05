@@ -1,3 +1,3 @@
 FROM ubuntu:16.04
-COPY web /web
+COPY web /
 CMD /web
